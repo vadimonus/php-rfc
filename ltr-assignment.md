@@ -1,14 +1,18 @@
-PHP RFC: Pipe assignment operator
+# PHP RFC: Left to right assignment operator
 
 Version: 0.0.1
+
 Date: 2025-06-23
+
 Author: Vadim Dvorovenko, vadimon@mail.ru
+
 Status: Draft
+
 Implementation: -
 
 # Introduction
 
-Pipe operator (or simular) can be used for assignment to reduce congnitive complexity.
+Left to right assignment operator can be used to reduce congnitive complexity when using long chain of pipe operators.
 
 ```
 // Current syntax
@@ -25,7 +29,7 @@ $result = "Hello World" |> strlen(...);
 Pipe operator introduced in RFC (https://wiki.php.net/rfc/pipe-operator-v3) may lead to a complication in the perception of the flow due to mixing of left-to-right and right-to-left action directions. To avoid this, it is proposed to use the pipe operator (or a new similar one) for left-to-right assigning.
 
 Long-standing traditions of procedural code uses two main reading directions: top-to-bottom for procedural flow and right-to-left for function call and assignment flow in single line.
-```
+```php
 // Top to bottom example
 $temp = "Hello World";          //   -1-|
                                 //      |
@@ -46,7 +50,7 @@ $result := array_map(strtoupper(...), str_split(htmlentities("Hello World")));
 
 The programmer's brain is tuned to perceive exactly these directions. When we try to reverse this directions, we need to to introduce additional rules, such as idents, to make hints to our brain that we should use bottom-to-top direction instead of top-to-bottom.
 
-```
+```php
 $result = 
 //   ^
 //   |
@@ -68,7 +72,7 @@ $result =
 
 Pipline operator and fluent pattern were invented to use top-to-bottom/left-to-right direction in function calls. Without assignments this gives perfect top-to-bottom and left-to-right code reading direction.
 
-```
+```php
 // Pipeline
 "Hello World"
     |> htmlentities(...)
@@ -83,7 +87,7 @@ Pipline operator and fluent pattern were invented to use top-to-bottom/left-to-r
 ```
 
 But things are getting worse, when we add asignment operator. We need to use top-to-bottom/left-to-righ reading direction for most parts of instruction, but bottom-to-top/right-to-left for last assignment action.
-```
+```php
 // Single line case
 //   |-----------------------------------------------------------4-------------------------------------------------|
 //   |            |-----1----|        |-----2-----|     |------3---|                                               |
@@ -110,27 +114,23 @@ The most natural and convenient reading direction for speakers of all LRT langua
 
 This RFC introduces of ability to use new pipe assignment operator for assignment to variable.
 
-```
-mixed |>= variable
-or
-mixed |> variable
+```php
+expr |=> $variable
 ```
 
 wich is equialent to 
 ```
-$variable = mixed
+$variable = expr
 ```
 
-The current bahavior of pipe operator when used with variable is wery poorly described in RFC (but covered with test - https://github.com/php/php-src/blob/master/Zend/tests/pipe_operator/mixed_callable_call.phpt#L73). While 8.5 is not released, we can make exclusion for piping to variable to use it only for assignment. When using for piping to callble, stored in variable, it could be wrapped with arrow function. In this way we even not need to introduce new operator, and can reuse pipe operator for assignment.
-If we prefer to use |> as assignment operator, we should change implementation before 8.5 release. In this case if want call closure from variable, it should be wrapped with other closure.
-
-```
+Examples:
+```php
 $times29 = function(int $x): int {
     return $x * 29;
 };
 
-1 |> $times29 |> $result; // Same as $result = $times29 = 1;
-1 |> fn($x) => $times29($x) |> $result; // Same as $result = 29;
+1 |=> $times29 |=> $result; // Same as $result = $times29 = 1;
+1 |> (fn($x) => $times29($x)) |=> $result; // Same as $result = 29;
 ```
 
 # In other languages
@@ -144,8 +144,7 @@ There have long been known contradictions between mathematicians and programmers
 
 # Backward Incompatible Changes
 
-* `|>=` version of operator should not create backward incompatible changes, as currently causes syntax error.
-* `|>` conflicts with one rare use case for pipe assignment operator, as described earlier.
+* `|=>` version of operator should not create backward incompatible changes, as currently causes syntax error.
 
 # RFC Impact
 
@@ -163,12 +162,12 @@ Not affected
 
 # Further scope
 
-If chosing `|>=` as operator, we can also create family of pipeline assignment operators.
+If chosing `|=>` as operator, we can also create family of pipeline assignment operators.
 
 | New operator   | Equialent   |
 |----------------|-------------|
-| `$a \|>= $b`   | `$b = $a`   |
-| `$a \|>.= $b`  | `$b .= $a`  |
-| `$a \|>+= $b`  | `$b += $a`  |
-| `$a \|>-= $b`  | `$b -= $a`  |
-| `$a \|>??= $b` | `$b ??= $a` |
+| `$a \|=> $b`   | `$b = $a`   |
+| `$a \|.=> $b`  | `$b .= $a`  |
+| `$a \|+=> $b`  | `$b += $a`  |
+| `$a \|-=> $b`  | `$b -= $a`  |
+| `$a \|??=> $b` | `$b ??= $a` |

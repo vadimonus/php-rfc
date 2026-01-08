@@ -10,7 +10,7 @@ Target Version: PHP 8.6
 
 Status: Draft
 
-Implementation: -
+Implementation: https://github.com/vadimonus/php-src/commits/pipe-to-throw
 
 # Introduction
 
@@ -38,7 +38,9 @@ expr |> throw
 throw expr
 ```
 
-Examples. That the code is always read in one direction, and there is no need to look back.
+## Examples
+
+That the code is always read in one direction, and there is no need to look back.
 ```php
 $exceptionBuilder = fn($message) => new Exception($message);
 "Exception message" |> $exceptionBuilder |> throw;
@@ -47,6 +49,10 @@ $exceptionBuilder = fn($message) => new Exception($message);
     |> (fn($message) => new Exception($message))
     |> throw;
 ```
+
+## Precedence
+
+Precedence for pipe to throw is selected same as for pipe fo callable operator. It is expected that it will lead to less less confusion, because pipe operators are expected to be used in chain, and it would be strange if last (piping to throw) will have other precedence. 
 
 # Backward Incompatible Changes
 

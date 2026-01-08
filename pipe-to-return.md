@@ -10,7 +10,7 @@ Target Version: PHP 8.6
 
 Status: Draft
 
-Implementation: -
+Implementation: https://github.com/vadimonus/php-src/commits/pipe-to-return
 
 # Introduction
 

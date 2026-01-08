@@ -6,6 +6,8 @@ Date: 2026-01-08
 
 Author: Vadim Dvorovenko, vadimon@mail.ru
 
+Target Version: PHP 8.6
+
 Status: Draft
 
 Implementation: -
@@ -109,7 +111,7 @@ The most natural and convenient reading direction for speakers of all LRT langua
 
 # Proposal
 
-This RFC introduces of ability to use new pipe assignment operator with `return` and `throw` keywords.
+This RFC introduces of ability to use new pipe assignment operator with `return` keyword.
 
 ```php
 expr |> return
@@ -117,15 +119,7 @@ expr |> return
 return expr
 ```
 
-The `return` and `throw` keywords are only keywords leading to function exit. Using long chains of pipe operators for exceptions is unlikely pattern. However it is logical to repeat everything that relates to the `return` keyword for the `throw` operator. So proposal is for `throw` keyword too.
-
-```php
-expr |> throw
-// equialent to
-throw expr
-```
-
-Examples. That the code is always read in one direction, and there is no need to look back.
+Example. That the code is always read in one direction, and there is no need to look back.
 ```php
 "Hello World" |> htmlentities(...) |> str_split(...) |> (fn($x) => array_map(strtoupper(...), $x)) |> return;
 // or
@@ -136,18 +130,9 @@ Examples. That the code is always read in one direction, and there is no need to
     |> return;
 ```
 
-```php
-$exceptionBuilder = fn($message) => new Exception($message);
-"Exception message" |> $exceptionBuilder |> throw;
-// or
-"Exception message"
-    |> (fn($message) => new Exception($message))
-    |> throw;
-```
-
 # Backward Incompatible Changes
 
-* Using `|>` with `return` and `throw` currently causes syntax error. So it should not create backward incompatible changes.
+* Using `|>` with `return` currently causes syntax error. So it should not create backward incompatible changes.
 
 # RFC Impact
 
@@ -162,3 +147,9 @@ Not affected
 
 ## To SAPIs
 Not affected
+
+# Further scope
+
+The `return` and `throw` keywords are only keywords leading to function exit. Using long chains of pipe operators for exceptions is unlikely pattern. However it is logical to repeat everything that relates to the `return` keyword for the `throw` operator.
+
+On the other hand, since PHP 8 (see https://wiki.php.net/rfc/throw_expression), throw is operator and not statement as `return`. So, operator precedence should be discussed. That's why, defferent RFC is planned for piping to `throw`.

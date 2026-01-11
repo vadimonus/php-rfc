@@ -30,7 +30,7 @@ Pipe operator introduced in RFC (https://wiki.php.net/rfc/pipe-operator-v3) may 
 
 Long-standing traditions of procedural code uses two main reading directions: top-to-bottom for procedural flow and right-to-left for function call and assignment flow in single line.
 ```php
-// Top to bottom example
+// Top-to-bottom example
 $temp = "Hello World";          //   -1-|
                                 //      |
 $temp = htmlentities($temp);    //   <--|    -2-|
